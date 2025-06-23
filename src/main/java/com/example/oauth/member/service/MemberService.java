@@ -1,5 +1,6 @@
 package com.example.oauth.member.service;
 
+import com.example.oauth.member.dto.GithubProfileDto;
 import com.example.oauth.member.dto.GoogleProfileDto;
 import com.example.oauth.member.dto.KakaoProfileDto;
 import com.example.oauth.member.dto.MemberCreateRequest;
@@ -52,8 +53,8 @@ public class MemberService {
 		return member;
 	}
 
-	public Member getMemberBySocialId(String sub) {
-		return memberRepository.findBySocialId(sub).orElse(null);
+	public Member getMemberBySocialId(String socialId) {
+		return memberRepository.findBySocialId(socialId).orElse(null);
 	}
 
 	@Transactional
@@ -86,11 +87,27 @@ public class MemberService {
 	public Member createMemberWithNaver(NaverProfileDto naverProfileDto) {
 		String name = naverProfileDto.getResponse().getName();
 		String email = naverProfileDto.getResponse().getEmail();
+
 		Member member = Member.builder()
 			.email(email)
 			.socialType(SocialType.NAVER)
 			.socialId(naverProfileDto.getResponse().getId())
 			.name(name)
+			.build();
+
+		return memberRepository.save(member);
+	}
+
+	@Transactional
+	public Member createMemberWithGithub(GithubProfileDto githubProfileDto) {
+		String email = githubProfileDto.getEmail();
+		String name = githubProfileDto.getName();
+
+		Member member = Member.builder()
+			.name(name)
+			.email(email)
+			.socialType(SocialType.GITHUB)
+			.socialId(githubProfileDto.getId())
 			.build();
 
 		return memberRepository.save(member);

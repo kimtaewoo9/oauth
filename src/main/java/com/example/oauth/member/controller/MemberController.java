@@ -2,6 +2,7 @@ package com.example.oauth.member.controller;
 
 import com.example.oauth.common.auth.JwtTokenProvider;
 import com.example.oauth.member.dto.AccessTokenDto;
+import com.example.oauth.member.dto.GithubProfileDto;
 import com.example.oauth.member.dto.GoogleProfileDto;
 import com.example.oauth.member.dto.KakaoProfileDto;
 import com.example.oauth.member.dto.MemberCreateRequest;
@@ -9,6 +10,7 @@ import com.example.oauth.member.dto.MemberLoginRequest;
 import com.example.oauth.member.dto.NaverProfileDto;
 import com.example.oauth.member.dto.RedirectDto;
 import com.example.oauth.member.entity.Member;
+import com.example.oauth.member.service.GithubService;
 import com.example.oauth.member.service.GoogleService;
 import com.example.oauth.member.service.KakaoService;
 import com.example.oauth.member.service.MemberService;
@@ -31,6 +33,7 @@ public class MemberController {
 	private final GoogleService googleService;
 	private final KakaoService kakaoService;
 	private final NaverService naverService;
+	private final GithubService githubService;
 
 	@PostMapping("/member/create")
 	public ResponseEntity<?> create(@RequestBody MemberCreateRequest memberCreateRequest) {
@@ -115,13 +118,37 @@ public class MemberController {
 
 		// 회원 가입 되었는지 확인후 .. 토큰 발급해줌
 		Member originMember = memberService.getMemberBySocialId(
-			naverProfileDto.getResponse().getEmail());
+			naverProfileDto.getResponse().getId());
 		if (originMember == null) {
 			originMember = memberService.createMemberWithNaver(naverProfileDto);
 		}
 
-		String token = jwtTokenProvider.createToken(originMember.getEmail(),
-			originMember.getRole());
+		String token = jwtTokenProvider
+			.createToken(originMember.getEmail(), originMember.getRole());
+
+		Map<String, Object> loginInfo = new HashMap<>();
+		loginInfo.put("id", originMember.getId());
+		loginInfo.put("token", token);
+
+		return ResponseEntity.ok(loginInfo);
+	}
+
+	@PostMapping("/member/github/doLogin")
+	public ResponseEntity<?> githubLogin(@RequestBody RedirectDto redirectDto) {
+		AccessTokenDto accessTokenDto = githubService
+			.getAccessToken(redirectDto.getCode(), redirectDto.getState());
+
+		GithubProfileDto githubProfileDto =
+			githubService.getGithubProfile(accessTokenDto.getAccess_token());
+
+		// 가입 되어있는지 확인 후, 토큰 처리
+		Member originMember = memberService.getMemberBySocialId(githubProfileDto.getId());
+		if (originMember == null) {
+			originMember = memberService.createMemberWithGithub(githubProfileDto);
+		}
+
+		String token = jwtTokenProvider
+			.createToken(originMember.getEmail(), originMember.getRole());
 
 		Map<String, Object> loginInfo = new HashMap<>();
 		loginInfo.put("id", originMember.getId());

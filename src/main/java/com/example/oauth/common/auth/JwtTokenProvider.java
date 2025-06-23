@@ -38,6 +38,7 @@ public class JwtTokenProvider {
 
 		Date now = new Date();
 
+		// claims(email, role), issuedAt, Expiration, secret_key가 필요 .
 		return Jwts.builder()
 			.setClaims(claims)
 			.setIssuedAt(now)
