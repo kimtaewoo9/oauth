@@ -6,11 +6,13 @@ import com.example.oauth.member.dto.GoogleProfileDto;
 import com.example.oauth.member.dto.KakaoProfileDto;
 import com.example.oauth.member.dto.MemberCreateRequest;
 import com.example.oauth.member.dto.MemberLoginRequest;
+import com.example.oauth.member.dto.NaverProfileDto;
 import com.example.oauth.member.dto.RedirectDto;
 import com.example.oauth.member.entity.Member;
 import com.example.oauth.member.service.GoogleService;
 import com.example.oauth.member.service.KakaoService;
 import com.example.oauth.member.service.MemberService;
+import com.example.oauth.member.service.NaverService;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class MemberController {
 	private final MemberService memberService;
 	private final GoogleService googleService;
 	private final KakaoService kakaoService;
+	private final NaverService naverService;
 
 	@PostMapping("/member/create")
 	public ResponseEntity<?> create(@RequestBody MemberCreateRequest memberCreateRequest) {
@@ -93,6 +96,32 @@ public class MemberController {
 
 		String token = jwtTokenProvider
 			.createToken(originMember.getEmail(), originMember.getRole());
+
+		Map<String, Object> loginInfo = new HashMap<>();
+		loginInfo.put("id", originMember.getId());
+		loginInfo.put("token", token);
+
+		return ResponseEntity.ok(loginInfo);
+	}
+
+	@PostMapping("/member/naver/doLogin")
+	public ResponseEntity<?> naverLogin(@RequestBody RedirectDto redirectDto) {
+		AccessTokenDto accessTokenDto = naverService
+			.getAccessToken(redirectDto.getCode(), redirectDto.getState());
+
+		// 네이버에서 사용자 정보 가져오기 ..
+		NaverProfileDto naverProfileDto = naverService.getNaverProfile(
+			accessTokenDto.getAccess_token());
+
+		// 회원 가입 되었는지 확인후 .. 토큰 발급해줌
+		Member originMember = memberService.getMemberBySocialId(
+			naverProfileDto.getResponse().getEmail());
+		if (originMember == null) {
+			originMember = memberService.createMemberWithNaver(naverProfileDto);
+		}
+
+		String token = jwtTokenProvider.createToken(originMember.getEmail(),
+			originMember.getRole());
 
 		Map<String, Object> loginInfo = new HashMap<>();
 		loginInfo.put("id", originMember.getId());
