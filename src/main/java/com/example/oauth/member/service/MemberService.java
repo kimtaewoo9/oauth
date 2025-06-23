@@ -1,8 +1,11 @@
 package com.example.oauth.member.service;
 
+import com.example.oauth.member.dto.GoogleProfileDto;
+import com.example.oauth.member.dto.KakaoProfileDto;
 import com.example.oauth.member.dto.MemberCreateRequest;
 import com.example.oauth.member.dto.MemberLoginRequest;
 import com.example.oauth.member.entity.Member;
+import com.example.oauth.member.entity.SocialType;
 import com.example.oauth.member.repository.MemberRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -44,5 +47,33 @@ public class MemberService {
 		}
 
 		return member;
+	}
+
+	public Member getMemberBySocialId(String sub) {
+		return memberRepository.findBySocialId(sub).orElse(null);
+	}
+
+	public Member createMemberWithGoogle(GoogleProfileDto googleProfileDto) {
+		String name = googleProfileDto.getFamily_name() + googleProfileDto.getGiven_name();
+		Member member = Member.builder()
+			.email(googleProfileDto.getEmail())
+			.socialType(SocialType.GOOGLE)
+			.socialId(googleProfileDto.getSub())
+			.name(name)
+			.build();
+
+		return memberRepository.save(member);
+	}
+
+	public Member createMemberWithKakao(KakaoProfileDto kakaoProfileDto) {
+		String name = kakaoProfileDto.getKakao_account().getProfile().getNickname();
+		Member member = Member.builder()
+			.email(kakaoProfileDto.getKakao_account().getEmail())
+			.socialType(SocialType.KAKAO)
+			.socialId(kakaoProfileDto.getId())
+			.name(name)
+			.build();
+
+		return memberRepository.save(member);
 	}
 }

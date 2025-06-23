@@ -43,7 +43,8 @@ public class SecurityConfig {
 			// 특정 url 패턴에 대해서는 인증처리 하지 않음 .
 			// 나머지 url 패턴에 대해서는 토큰이 없거나 유효하지 않아 Authentication 객체가 없으면 이 단계에서 차단됨 .
 			.authorizeHttpRequests(
-				a -> a.requestMatchers("/member/create", "/member/doLogin")
+				a -> a.requestMatchers("/member/create", "/member/doLogin",
+						"/member/google/doLogin", "/member/kakao/doLogin")
 					.permitAll().anyRequest().authenticated())
 			// 특정 url 을 제외하고 다 검증하겠다 .. 근데 어디서 ? jwtTokenFilter 에서 .
 			// UsernamePasswordAuthenticationFilter 라는 스프링 기본 필터 앞에 jwtTokenFilter 배치함 .

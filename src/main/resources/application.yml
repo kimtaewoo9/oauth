@@ -15,3 +15,12 @@ jwt:
   # 32 ?? ??? ???? ??? .
   secret: b2F1dGhzZXJ2ZXJzZWNyZXRhY2Nlc3N0b2tlbm9hdXRoc2VydmVyc2VjcmV0YWNjZXNzdG9rZW5vYXV0aHNlcnZlcnNlY3JldGFjY2Vzc3Rva2Vu
   expiration: 3000 # 3000?
+
+oauth:
+  google:
+    client-id: 495083622583-2fs7mjn5bi85ihp1ge7euogfumd3610m.apps.googleusercontent.com
+    client-secret: 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
+    redirect-uri: http://localhost:3000/oauth/google/redirect
+  kakao:
+    client_id: dc2b1c572cf4112ab3ec7d95dde0b5c7
+    redirect_uri: http://localhost:3000/oauth/kakao/redirect # ???? ??? ? ??? ????? .
