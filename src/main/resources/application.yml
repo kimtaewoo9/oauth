@@ -18,9 +18,13 @@ jwt:
 
 oauth:
   google:
-    client-id: 495083622583-2fs7mjn5bi85ihp1ge7euogfumd3610m.apps.googleusercontent.com
-    client-secret: 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
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
     redirect-uri: http://localhost:3000/oauth/google/redirect
   kakao:
-    client_id: dc2b1c572cf4112ab3ec7d95dde0b5c7
-    redirect_uri: http://localhost:3000/oauth/kakao/redirect # ???? ??? ? ??? ????? .
+    client_id: ${KAKAO_CLIENT_ID}
+    redirect_uri: http://localhost:3000/oauth/kakao/redirect
+  naver:
+    client_id: ${NAVER_CLIENT_ID}
+    client_secret: ${NAVER_CLIENT_SECRET}
+    redirect_uri: http://localhost:3000/oauth/naver/redirect
