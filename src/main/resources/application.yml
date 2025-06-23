@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/oauthdb
+    username: root
+    password: root
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+jwt:
+  # 32 ?? ??? ???? ??? .
+  secret: b2F1dGhzZXJ2ZXJzZWNyZXRhY2Nlc3N0b2tlbm9hdXRoc2VydmVyc2VjcmV0YWNjZXNzdG9rZW5vYXV0aHNlcnZlcnNlY3JldGFjY2Vzc3Rva2Vu
+  expiration: 3000 # 3000?
+
+oauth:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    redirect-uri: http://localhost:3000/oauth/google/redirect
+  kakao:
+    client_id: ${KAKAO_CLIENT_ID}
+    redirect_uri: http://localhost:3000/oauth/kakao/redirect
+  naver:
+    client_id: ${NAVER_CLIENT_ID}
+    client_secret: ${NAVER_CLIENT_SECRET}
+    redirect_uri: http://localhost:3000/oauth/naver/redirect
