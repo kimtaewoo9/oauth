@@ -1,5 +1,6 @@
 package com.example.oauth.member.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AccessTokenDto {
 
 	// getAccessToken 을 할때 . 구글에서 여러가지 정보를 줌. 그걸 DTO 로 받는다 .
