@@ -1,5 +1,6 @@
 package com.example.oauth.member.service;
 
+import com.example.oauth.member.dto.DiscordProfileDto;
 import com.example.oauth.member.dto.GithubProfileDto;
 import com.example.oauth.member.dto.GoogleProfileDto;
 import com.example.oauth.member.dto.KakaoProfileDto;
@@ -108,6 +109,20 @@ public class MemberService {
 			.email(email)
 			.socialType(SocialType.GITHUB)
 			.socialId(githubProfileDto.getId())
+			.build();
+
+		return memberRepository.save(member);
+	}
+
+	public Member createMemberWithDiscord(DiscordProfileDto discordProfileDto) {
+		String email = discordProfileDto.getEmail();
+		String username = discordProfileDto.getUsername();
+
+		Member member = Member.builder()
+			.email(email)
+			.name(username)
+			.socialType(SocialType.DISCORD)
+			.socialId(discordProfileDto.getId())
 			.build();
 
 		return memberRepository.save(member);

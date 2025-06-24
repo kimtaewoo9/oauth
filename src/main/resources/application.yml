@@ -27,8 +27,11 @@ oauth:
   naver:
     client_id: ${NAVER_CLIENT_ID}
     client_secret: ${NAVER_CLIENT_SECRET}
-    redirect_uri: http://localhost:3000/oauth/naver/redirect
   github:
     client_id: ${GITHUB_CLIENT_ID}
     client_secret: ${GITHUB_CLIENT_SECRET}
     redirect_uri: http://localhost:3000/oauth/github/redirect
+  discord:
+    client_id: ${DISCORD_CLIENT_ID}
+    client_secret: ${DISCORD_CLIENT_SECRET}
+    redirect_uri: http://localhost:3000/oauth/discord/redirect
