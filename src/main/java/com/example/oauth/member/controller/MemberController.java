@@ -2,6 +2,7 @@ package com.example.oauth.member.controller;
 
 import com.example.oauth.common.auth.JwtTokenProvider;
 import com.example.oauth.member.dto.AccessTokenDto;
+import com.example.oauth.member.dto.DiscordProfileDto;
 import com.example.oauth.member.dto.GithubProfileDto;
 import com.example.oauth.member.dto.GoogleProfileDto;
 import com.example.oauth.member.dto.KakaoProfileDto;
@@ -10,6 +11,7 @@ import com.example.oauth.member.dto.MemberLoginRequest;
 import com.example.oauth.member.dto.NaverProfileDto;
 import com.example.oauth.member.dto.RedirectDto;
 import com.example.oauth.member.entity.Member;
+import com.example.oauth.member.service.DiscordService;
 import com.example.oauth.member.service.GithubService;
 import com.example.oauth.member.service.GoogleService;
 import com.example.oauth.member.service.KakaoService;
@@ -18,6 +20,7 @@ import com.example.oauth.member.service.NaverService;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,15 +28,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
 	private final JwtTokenProvider jwtTokenProvider;
 
 	private final MemberService memberService;
+
 	private final GoogleService googleService;
 	private final KakaoService kakaoService;
 	private final NaverService naverService;
 	private final GithubService githubService;
+	private final DiscordService discordService;
 
 	@PostMapping("/member/create")
 	public ResponseEntity<?> create(@RequestBody MemberCreateRequest memberCreateRequest) {
@@ -145,6 +151,31 @@ public class MemberController {
 		Member originMember = memberService.getMemberBySocialId(githubProfileDto.getId());
 		if (originMember == null) {
 			originMember = memberService.createMemberWithGithub(githubProfileDto);
+		}
+
+		String token = jwtTokenProvider
+			.createToken(originMember.getEmail(), originMember.getRole());
+
+		Map<String, Object> loginInfo = new HashMap<>();
+		loginInfo.put("id", originMember.getId());
+		loginInfo.put("token", token);
+
+		return ResponseEntity.ok(loginInfo);
+	}
+
+	@PostMapping("/member/discord/doLogin")
+	public ResponseEntity<?> discordLogin(@RequestBody RedirectDto redirectDto) {
+		AccessTokenDto accessTokenDto = discordService
+			.getAccessToken(redirectDto.getCode());
+
+		// 토큰으로 profile 받아오기 .
+		DiscordProfileDto discordProfileDto =
+			discordService.getDiscordProfile(accessTokenDto.getAccess_token());
+
+		Member originMember = memberService.getMemberBySocialId(
+			discordProfileDto.getId());
+		if (originMember == null) {
+			originMember = memberService.createMemberWithDiscord(discordProfileDto);
 		}
 
 		String token = jwtTokenProvider
